@@ -24,6 +24,12 @@ export async function GET(request: Request) {
 
     } catch (error) {
         console.log(error);
+        if(error instanceof jwt.TokenExpiredError) {
+            console.log('token expired');
+        }
+        return new Response('Invalid token', {
+            status: 401,
+        });
     }
 
     return new Response(JSON.stringify(decode), {

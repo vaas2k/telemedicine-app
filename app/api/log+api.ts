@@ -34,7 +34,7 @@ export async function POST(request: Request) {
     username: getUser.username,
     role : getUser.role
   }
-  const token = jwt.sign(data, process.env.JWT_SECRETKEY!, { expiresIn: '24h' });
+  const token = jwt.sign(data, process.env.JWT_SECRETKEY!, { expiresIn: '24hrs' });
 
   return new Response(token, {
     status: 200,

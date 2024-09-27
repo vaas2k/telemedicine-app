@@ -7,14 +7,15 @@ import Login from '@/components/Auth/Login';
 import Signup from '@/components/Auth/Signup';
 import Splash from '@/components/Reuseable/splash';
 import axios from 'axios';
-import { useAuth,AuthType } from '@/store/useAuth';
+import { useAuth, AuthType } from '@/store/useAuth';
 const App = () => {
 
     const router = useRouter();
     const [authComp, setAuthComp] = React.useState(true);
-    
-    const login = useAuth((state : AuthType) => state.login);
-    const setData = useAuth((state : AuthType) => state.setData);
+
+    const login = useAuth((state: AuthType) => state.login);
+    const setData = useAuth((state: AuthType) => state.setData);
+    const isAuthenticated = useAuth((state: AuthType) => state.isAuthenticated);
 
     const [loading, setLoading] = React.useState(true);
     const toggleComp = () => {
@@ -25,30 +26,34 @@ const App = () => {
 
         (async function verifyAuth() {
             const token = await SecureStore.getItemAsync('token');
-            if (token) {
-                const res = await axios.get('http://localhost:8081/api/verify', {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
+            try {
 
-                if (res.status == 200) {
-                    const data = res.data;
-                    login();
-                    setData(data);
-                    if (data.role == 'patient') {
-                        router.push('/patient');
-                    }
-                    else {
-                        router.push('/docter');
+
+                if (token) {
+                    const res = await axios.get('http://localhost:8081/api/verify', {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+
+                    if (res.status == 200) {
+                        const data = res.data;
+                        login();
+                        setData(data);
+                        if (data.role == 'patient') {
+                            router.push('/patient');
+                        }
+                        else {
+                            router.push('/docter');
+                        }
                     }
                 }
-
+                else {
+                    setLoading(false);
+                }
+            } catch (error) {
+                console.log(error);
             }
-            else {
-                setLoading(false);
-            }
-            router.push('/patient');
             setLoading(false);
         })();
     }, [])
